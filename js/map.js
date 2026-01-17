@@ -50,6 +50,7 @@ function loadCandlesToMap() {
 }
 
 // Adicionar uma vela ao mapa
+// Substitua a função addCandleToMap com esta versão melhorada:
 function addCandleToMap(candleId, candle) {
     // Se já existe, remover primeiro
     if (markers[candleId]) {
@@ -61,12 +62,52 @@ function addCandleToMap(candleId, candle) {
         return;
     }
     
+    // Cor da vela baseada na categoria (opcional)
+    let candleColor = '#FFF8E1'; // cor padrão (cera clara)
+    let flameColor = '#FFD700';  // cor da chama (dourado)
+    
+    if (candle.category) {
+        switch(candle.category) {
+            case 'health': 
+                candleColor = '#FFEBEE'; // vermelho suave
+                flameColor = '#FF5252';  // vermelho
+                break;
+            case 'family': 
+                candleColor = '#E8F5E9'; // verde suave
+                flameColor = '#4CAF50';  // verde
+                break;
+            case 'peace': 
+                candleColor = '#E3F2FD'; // azul suave
+                flameColor = '#2196F3';  // azul
+                break;
+            case 'memory': 
+                candleColor = '#F3E5F5'; // roxo suave
+                flameColor = '#9C27B0';  // roxo
+                break;
+            default: 
+                candleColor = '#FFF8E1'; // padrão
+                flameColor = '#FFD700';  // padrão
+        }
+    }
+    
+    // Criar HTML personalizado para o marcador
+    const candleHtml = `
+        <div class="animated-candle">
+            <div class="candle-flame" style="
+                background: linear-gradient(to bottom, ${flameColor}, #FF8C00);
+                box-shadow: 0 0 20px ${flameColor}, 0 0 40px ${flameColor};
+            "></div>
+            <div class="candle-wax" style="background: ${candleColor};"></div>
+        </div>
+    `;
+    
     // Criar ícone personalizado
     const candleIcon = L.divIcon({
-        className: 'candle-marker',
-        html: '<i class="fas fa-fire"></i>',
-        iconSize: [30, 30],
-        iconAnchor: [15, 30]
+        className: 'animated-candle-marker',
+        html: candleHtml,
+        iconSize: [30, 50],      // Largura, Altura
+        iconAnchor: [15, 50],    // Ponto de ancoragem (centro inferior)
+        popupAnchor: [0, -45]    // Onde o popup aparece
     });
     
     // Criar marcador
@@ -78,7 +119,18 @@ function addCandleToMap(candleId, candle) {
     const popupContent = createPopupContent(candleId, candle);
     marker.bindPopup(popupContent, {
         maxWidth: 300,
-        closeButton: true
+        closeButton: true,
+        autoClose: false,
+        closeOnClick: false
+    });
+    
+    // Adicionar efeito de hover
+    marker.on('mouseover', function() {
+        this.openPopup();
+    });
+    
+    marker.on('mouseout', function() {
+        this.closePopup();
     });
     
     // Salvar referência
