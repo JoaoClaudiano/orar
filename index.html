@@ -3,20 +3,402 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oratório Virtual - GitHub Pages</title>
+    <title>🕯️ Oratório Virtual</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        /* Estilos aqui (vou mostrar completo abaixo) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: #FFD54F;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .github-badge {
+            background: rgba(255,255,255,0.1);
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .github-badge i {
+            margin-right: 5px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #FFD54F;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .main-action {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 50px;
+            margin: 40px 0;
+        }
+        
+        .candle {
+            width: 80px;
+            height: 120px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        
+        .flame {
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(to bottom, #FF9800, #FF5722);
+            border-radius: 50% 50% 20% 20%;
+            margin: 0 auto;
+            position: relative;
+            animation: flicker 1.5s infinite alternate;
+            box-shadow: 0 0 30px #FF9800;
+        }
+        
+        .wax {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(to right, #FFF8E1, #FFECB3);
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { transform: scale(1) rotate(-2deg); }
+            50% { transform: scale(1.1) rotate(2deg); }
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #FFD54F, #FFB300);
+            color: #1a237e;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 213, 79, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 213, 79, 0.4);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 50px 0;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #FFD54F;
+            margin-bottom: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .stats { grid-template-columns: 1fr; }
+            .features { grid-template-columns: 1fr; }
+        }
     </style>
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <!-- Conteúdo aqui -->
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-pray"></i> Oratório Virtual</h1>
+            <p class="subtitle">Acenda sua vela digital e una-se a milhares em oração</p>
+            <div class="github-badge">
+                <i class="fab fa-github"></i> Hospedado no GitHub Pages
+            </div>
+        </header>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <span class="stat-number" id="totalCandles">1,247</span>
+                <span class="stat-label">Velas Acesas Hoje</span>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="liveCandles">86</span>
+                <span class="stat-label">Agora Online</span>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="countries">42</span>
+                <span class="stat-label">Países</span>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="prayers">5,892</span>
+                <span class="stat-label">Orações Hoje</span>
+            </div>
+        </div>
+        
+        <section class="main-action">
+            <div class="candle">
+                <div class="flame"></div>
+                <div class="wax"></div>
+            </div>
+            
+            <h2 style="margin-bottom: 20px; font-size: 2rem;">Acenda Sua Vela de Intenção</h2>
+            <p style="margin-bottom: 30px; opacity: 0.9; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Sua vela permanecerá acesa virtualmente por 7 dias. Compartilhe com amigos e familiares para orarem juntos.
+            </p>
+            
+            <button class="btn" onclick="lightCandle()">
+                <i class="fas fa-fire"></i> Acender uma Vela
+            </button>
+            
+            <div style="margin-top: 30px;">
+                <button class="btn" onclick="viewWall()" style="background: rgba(255,255,255,0.1); color: white;">
+                    <i class="fas fa-th-large"></i> Ver Mural de Orações
+                </button>
+            </div>
+        </section>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-globe-americas"></i>
+                </div>
+                <h3>Comunidade Global</h3>
+                <p>Conecte-se com pessoas de todo o mundo em oração.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+                <h3>Privacidade</h3>
+                <p>Escolha entre vela privada, anônima ou pública.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-hands-praying"></i>
+                </div>
+                <h3>Oração Personalizada</h3>
+                <p>Receba uma oração gerada para sua intenção específica.</p>
+            </div>
+        </div>
+        
+        <div id="candleForm" style="display: none; background: rgba(255,255,255,0.05); padding: 30px; border-radius: 15px; margin: 40px 0;">
+            <h3 style="margin-bottom: 20px; color: #FFD54F;">Acender Vela</h3>
+            <div style="display: grid; gap: 15px; max-width: 500px; margin: 0 auto;">
+                <input type="text" id="intention" placeholder="Sua intenção (ex: saúde da família)" style="padding: 15px; border-radius: 10px; border: none; font-size: 1rem;">
+                <select id="saint" style="padding: 15px; border-radius: 10px; border: none; font-size: 1rem;">
+                    <option value="">Escolha um intercessor (opcional)</option>
+                    <option value="sao-judas">São Judas Tadeu</option>
+                    <option value="ns-aparecida">Nossa Senhora Aparecida</option>
+                    <option value="sao-joao">São João Batista</option>
+                    <option value="santa-rita">Santa Rita de Cássia</option>
+                    <option value="universo">Enviar ao Universo</option>
+                </select>
+                <select id="visibility" style="padding: 15px; border-radius: 10px; border: none; font-size: 1rem;">
+                    <option value="private">🔒 Vela Privada (só você vê)</option>
+                    <option value="community">👥 Comunidade (anônima)</option>
+                    <option value="public">🌍 Pública (nome e intenção visíveis)</option>
+                </select>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="submitCandle()" class="btn" style="flex: 1;">
+                        <i class="fas fa-check"></i> Acender Vela
+                    </button>
+                    <button onclick="closeForm()" class="btn" style="background: rgba(255,255,255,0.1); color: white; flex: 1;">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Oratório Virtual © 2024 | Site hospedado no GitHub Pages</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">
+                Este é um protótipo. Para versão completa com banco de dados, use Firebase Hosting.
+            </p>
+        </footer>
+    </div>
+    
     <script>
-        // Firebase config aqui
-        // Código JavaScript aqui
+        // Configuração do Firebase (você precisa colocar SUAS credenciais aqui)
+        // Vá no Firebase Console → Configurações do projeto → Apps → Web
+        // Copie o firebaseConfig e cole abaixo:
+        
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY_AQUI",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO_ID",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+        
+        // Inicializar Firebase (comente se ainda não tiver credenciais)
+        // firebase.initializeApp(firebaseConfig);
+        // const db = firebase.firestore();
+        // const auth = firebase.auth();
+        
+        // Simulação de dados (REMOVA quando conectar ao Firebase real)
+        function updateStats() {
+            document.getElementById('totalCandles').textContent = 
+                Math.floor(Math.random() * 2000) + 1000;
+            document.getElementById('liveCandles').textContent = 
+                Math.floor(Math.random() * 200) + 50;
+            document.getElementById('countries').textContent = 
+                Math.floor(Math.random() * 50) + 30;
+            document.getElementById('prayers').textContent = 
+                Math.floor(Math.random() * 8000) + 5000;
+        }
+        
+        // Atualizar estatísticas a cada 10 segundos
+        setInterval(updateStats, 10000);
+        updateStats();
+        
+        // Funções do site
+        function lightCandle() {
+            document.getElementById('candleForm').style.display = 'block';
+            window.scrollTo({
+                top: document.getElementById('candleForm').offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+        
+        function closeForm() {
+            document.getElementById('candleForm').style.display = 'none';
+        }
+        
+        function submitCandle() {
+            const intention = document.getElementById('intention').value;
+            const saint = document.getElementById('saint').value;
+            const visibility = document.getElementById('visibility').value;
+            
+            if (!intention) {
+                alert('Por favor, escreva sua intenção.');
+                return;
+            }
+            
+            // Aqui você conectaria com o Firebase para salvar
+            // Exemplo com Firebase (descomente quando configurar):
+            /*
+            db.collection('candles').add({
+                intention: intention,
+                saint: saint,
+                visibility: visibility,
+                litAt: new Date(),
+                userId: auth.currentUser ? auth.currentUser.uid : 'anonymous'
+            }).then(() => {
+                alert('Vela acesa com sucesso! Sua intenção está em nossas orações.');
+                closeForm();
+            });
+            */
+            
+            // Simulação (REMOVA quando usar Firebase)
+            alert(`Vela acesa com sucesso!\nIntenção: ${intention}\nIntercessor: ${saint || 'Não especificado'}\nVisibilidade: ${visibility}`);
+            closeForm();
+            
+            // Atualizar contador
+            const current = parseInt(document.getElementById('totalCandles').textContent.replace(',', ''));
+            document.getElementById('totalCandles').textContent = (current + 1).toLocaleString();
+        }
+        
+        function viewWall() {
+            alert('Em breve: Mural de Orações com velas de todo o mundo!');
+        }
+        
+        // Animar vela
+        const flame = document.querySelector('.flame');
+        setInterval(() => {
+            flame.style.animation = 'none';
+            setTimeout(() => {
+                flame.style.animation = 'flicker 1.5s infinite alternate';
+            }, 10);
+        }, 5000);
     </script>
 </body>
 </html>
