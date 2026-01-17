@@ -10,20 +10,11 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin=""/>
         
-        
-    <!-- PixiJS via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
-    
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Estilos Customizados -->
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
 <body>
     <!-- Overlay de boas-vindas -->
@@ -222,14 +213,67 @@
         <i class="fas fa-bars"></i>
     </button>
     
+    <!-- ========== TODOS OS SCRIPTS AQUI (ORDEM CRÍTICA) ========== -->
+    
+    <!-- Firebase SDK (Compat Mode) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
     <!-- Leaflet JS (Mapa) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
     
-    <!-- Scripts do Projeto -->
-    <script src="js/firebase-config.js"></script>
-    <script src="js/map.js"></script>
-    <script src="js/app.js"></script>
+    <!-- PixiJS (Gráficos) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
+    
+    <!-- Scripts do Projeto (ORDEM CRÍTICA) -->
+    <script src="js/firebase-config.js"></script>  <!-- Este deve conter firebaseConfig e inicialização -->
+    <script src="js/map.js"></script>              <!-- Já atualizado com integração da rede -->
+    <script src="js/rede.js"></script>             <!-- NOVO: Sistema de fios entre velas -->
+    <script src="js/app.js"></script>              <!-- Já atualizado com initRedeDeIntencoes() -->
+    
+    <!-- Script de inicialização da rede (opcional, se precisar) -->
+    <script>
+        // Inicialização extra para garantir que a rede funcione
+        setTimeout(() => {
+            console.log('🕸️ Verificando rede de intenções...');
+            
+            // Verifica se todos os componentes estão carregados
+            const components = {
+                'Firebase': () => window.firebaseApp,
+                'Mapa': () => window.map,
+                'Rede': () => window.RedeDeIntencoes,
+                'Markers': () => window.markers
+            };
+            
+            Object.entries(components).forEach(([name, check]) => {
+                console.log(`${name}: ${check() ? '✅' : '❌'}`);
+            });
+            
+            // Forçar conexão se necessário
+            if (window.RedeDeIntencoes && !window.redeGlobal && window.map) {
+                console.log('🔧 Inicializando rede manualmente...');
+                window.redeGlobal = new window.RedeDeIntencoes();
+                
+                setTimeout(() => {
+                    if (window.getCandlesForNetwork) {
+                        try {
+                            const candles = window.getCandlesForNetwork();
+                            candles.forEach(candle => {
+                                if (window.connectCandleToNetwork) {
+                                    window.connectCandleToNetwork(candle);
+                                }
+                            });
+                            console.log(`✨ ${candles.length} velas conectadas`);
+                        } catch (e) {
+                            console.error('Erro ao conectar velas:', e);
+                        }
+                    }
+                }, 1000);
+            }
+        }, 3000); // Aguarda 3 segundos para tudo carregar
+    </script>
 </body>
 </html>
