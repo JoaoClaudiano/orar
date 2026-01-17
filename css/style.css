@@ -426,3 +426,296 @@ body {
         width: 95%;
     }
 }
+
+/* ========== VELA ANIMADA NO MAPA ========== */
+.animated-candle-marker {
+    background: none;
+    border: none;
+}
+
+.animated-candle {
+    position: relative;
+    width: 30px;
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transform-origin: bottom center;
+    transition: transform 0.3s ease;
+}
+
+.animated-candle:hover {
+    transform: scale(1.2);
+}
+
+/* Chama da vela */
+.candle-flame {
+    width: 15px;
+    height: 25px;
+    background: linear-gradient(to bottom, #FFD700, #FF8C00);
+    border-radius: 50% 50% 20% 20%;
+    position: relative;
+    animation: 
+        flame-flicker 0.8s infinite alternate,
+        flame-dance 1.5s infinite alternate;
+    box-shadow: 
+        0 0 20px #FFD700,
+        0 0 40px #FF8C00,
+        0 0 60px #FF4500;
+    filter: blur(0.5px);
+    z-index: 2;
+}
+
+/* Corpo da vela (cera) */
+.candle-wax {
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(
+        to right,
+        #FFF8E1 0%,
+        #FFECB3 20%,
+        #FFF8E1 40%,
+        #FFECB3 60%,
+        #FFF8E1 80%,
+        #FFECB3 100%
+    );
+    border-radius: 5px;
+    position: relative;
+    box-shadow: 
+        inset 0 -5px 10px rgba(0,0,0,0.1),
+        0 5px 15px rgba(0,0,0,0.2);
+    z-index: 1;
+    margin-top: -5px;
+}
+
+/* Efeito de derretimento da cera */
+.candle-wax::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 5px;
+    right: 5px;
+    height: 6px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    border-radius: 50%;
+    filter: blur(1px);
+}
+
+/* Animações da chama */
+@keyframes flame-flicker {
+    0%, 100% {
+        transform: scale(1) rotate(-2deg);
+        opacity: 0.9;
+        box-shadow: 
+            0 0 15px #FFD700,
+            0 0 30px #FF8C00,
+            0 0 45px #FF4500;
+    }
+    25% {
+        transform: scale(1.1) rotate(1deg);
+        opacity: 1;
+        box-shadow: 
+            0 0 25px #FFD700,
+            0 0 50px #FF8C00,
+            0 0 75px #FF4500;
+    }
+    50% {
+        transform: scale(0.95) rotate(2deg);
+        opacity: 0.8;
+        box-shadow: 
+            0 0 10px #FFD700,
+            0 0 20px #FF8C00,
+            0 0 30px #FF4500;
+    }
+    75% {
+        transform: scale(1.05) rotate(-1deg);
+        opacity: 1;
+        box-shadow: 
+            0 0 20px #FFD700,
+            0 0 40px #FF8C00,
+            0 0 60px #FF4500;
+    }
+}
+
+@keyframes flame-dance {
+    0%, 100% {
+        height: 25px;
+        width: 15px;
+    }
+    50% {
+        height: 28px;
+        width: 12px;
+    }
+}
+
+/* Efeito de fumaça sutil */
+.candle-flame::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 15px;
+    background: linear-gradient(to top, rgba(255,255,255,0.1), transparent);
+    border-radius: 50%;
+    filter: blur(3px);
+    animation: smoke 2s infinite ease-in-out;
+    opacity: 0.5;
+}
+
+@keyframes smoke {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translateX(-50%) translateY(-5px);
+        opacity: 0.5;
+    }
+}
+
+/* ========== MARCADOR DO USUÁRIO ========== */
+.user-marker-icon {
+    background: none;
+    border: none;
+}
+
+.user-marker {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-marker-dot {
+    width: 20px;
+    height: 20px;
+    background: #4CAF50;
+    border-radius: 50%;
+    box-shadow: 
+        0 0 0 4px rgba(76, 175, 80, 0.3),
+        0 0 0 8px rgba(76, 175, 80, 0.2),
+        0 0 20px rgba(76, 175, 80, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.user-marker-pulse {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: rgba(76, 175, 80, 0.2);
+    border-radius: 50%;
+    animation: ripple 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 
+            0 0 0 4px rgba(76, 175, 80, 0.3),
+            0 0 0 8px rgba(76, 175, 80, 0.2);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 
+            0 0 0 6px rgba(76, 175, 80, 0.4),
+            0 0 0 12px rgba(76, 175, 80, 0.3);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* ========== MARCADOR TEMPORÁRIO ========== */
+.temp-marker-icon {
+    background: none;
+    border: none;
+}
+
+.temp-marker {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.temp-marker-pin {
+    width: 25px;
+    height: 25px;
+    background: #FF9800;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    position: relative;
+    animation: bounce 1s infinite alternate;
+}
+
+.temp-marker-pin::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes bounce {
+    0% {
+        transform: rotate(-45deg) translateY(0);
+    }
+    100% {
+        transform: rotate(-45deg) translateY(-5px);
+    }
+}
+
+/* ========== CLUSTER DE VELAS (para muitas velas juntas) ========== */
+.candle-cluster {
+    width: 40px;
+    height: 40px;
+    background: rgba(139, 69, 19, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 
+        0 0 0 5px rgba(255, 215, 0, 0.3),
+        0 5px 15px rgba(0,0,0,0.3);
+    border: 2px solid #FFD700;
+    animation: cluster-pulse 2s infinite;
+}
+
+@keyframes cluster-pulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 0 5px rgba(255, 215, 0, 0.3),
+            0 5px 15px rgba(0,0,0,0.3);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 10px rgba(255, 215, 0, 0.5),
+            0 8px 25px rgba(0,0,0,0.4);
+    }
+}
+
+
+
