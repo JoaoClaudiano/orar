@@ -1,3 +1,4 @@
+// 🕸️ REDE DE INTENÇÕES - Conexões visuais entre velas
 class RedeDeIntencoes {
     constructor() {
         // Configuração do canvas PixiJS
@@ -9,20 +10,32 @@ class RedeDeIntencoes {
             resolution: window.devicePixelRatio || 1
         });
         
-        // Adiciona canvas atrás do conteúdo principal
-        this.app.view.style.position = 'fixed';
-        this.app.view.style.top = '0';
-        this.app.view.style.left = '0';
-        this.app.view.style.zIndex = '1';
-        this.app.view.style.pointerEvents = 'none'; // Permite clicar nas velas
-        document.body.prepend(this.app.view);
+        // Adiciona canvas sobre o mapa
+        this.app.view.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 500;
+            pointer-events: none;
+        `;
+        
+        // Adiciona o canvas dentro do container do mapa
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) {
+            mapContainer.appendChild(this.app.view);
+        } else {
+            console.error('Container do mapa não encontrado');
+            document.body.appendChild(this.app.view);
+        }
         
         // Contêiner para os fios
         this.fiosContainer = new PIXI.Container();
         this.app.stage.addChild(this.fiosContainer);
         
         // Mapa para armazenar fios por categoria
-        this.fiosPorCategoria = new Map();
+        this.fiosPorCategoria = new Map(); // Chave: categoria, valor: { velas: [], fios: [] }
         
         // Configurações visuais
         this.config = {
@@ -46,32 +59,30 @@ class RedeDeIntencoes {
         
         // Redimensionamento
         window.addEventListener('resize', () => this.redimensionar());
+        
+        console.log("🕸️ Rede de intenções criada");
     }
     
     // Adiciona uma vela à rede
     adicionarVela(velaInfo) {
-        // velaInfo: { id, elementoDOM, categoria, x, y }
         const categoria = velaInfo.categoria || 'Geral';
         
-        // Cria array para a categoria se não existir
+        // Inicializa a estrutura da categoria se não existir
         if (!this.fiosPorCategoria.has(categoria)) {
-            this.fiosPorCategoria.set(categoria, []);
+            this.fiosPorCategoria.set(categoria, { velas: [], fios: [] });
         }
         
-        // Conecta com todas as velas da mesma categoria
-        const velasDaCategoria = this.fiosPorCategoria.get(categoria);
+        const categoriaData = this.fiosPorCategoria.get(categoria);
         
-        velasDaCategoria.forEach(vExistente => {
+        // Conecta com todas as velas da mesma categoria
+        categoriaData.velas.forEach(vExistente => {
             this.criarFio(vExistente, velaInfo, categoria);
         });
         
         // Adiciona esta vela à lista
-        velasDaCategoria.push(velaInfo);
+        categoriaData.velas.push(velaInfo);
         
-        // Adiciona evento de clique
-        velaInfo.elementoDOM.addEventListener('click', () => {
-            this.ativarCategoria(categoria, velaInfo.id);
-        });
+        console.log(`🔗 Vela ${velaInfo.id} conectada à categoria "${categoria}"`);
     }
     
     // Cria um fio entre duas velas
@@ -82,18 +93,15 @@ class RedeDeIntencoes {
         const fio = {
             linha: linha,
             velaA: velaA,
-            velaB: velab,
+            velaB: velaB,
             categoria: categoria,
             fasePulsacao: Math.random() * Math.PI * 2, // Fase aleatória
             estaAtivo: false
         };
         
-        // Adiciona à lista da categoria
-        const fiosCategoria = this.fiosPorCategoria.get(categoria);
-        if (!fiosCategoria.fios) {
-            fiosCategoria.fios = [];
-        }
-        fiosCategoria.fios.push(fio);
+        // Adiciona à lista de fios da categoria
+        const categoriaData = this.fiosPorCategoria.get(categoria);
+        categoriaData.fios.push(fio);
         
         // Desenha o fio inicial
         this.atualizarFio(fio);
@@ -123,11 +131,11 @@ class RedeDeIntencoes {
             opacidadeFinal
         );
         
-        // Ponto central das velas
-        const x1 = fio.velaA.x + fio.velaA.elementoDOM.clientWidth / 2;
-        const y1 = fio.velaA.y + fio.velaA.elementoDOM.clientHeight / 2;
-        const x2 = fio.velaB.x + fio.velaB.elementoDOM.clientWidth / 2;
-        const y2 = fio.velaB.y + fio.velaB.elementoDOM.clientHeight / 2;
+        // As coordenadas x e y já são o ponto central do marcador
+        const x1 = fio.velaA.x;
+        const y1 = fio.velaA.y;
+        const x2 = fio.velaB.x;
+        const y2 = fio.velaB.y;
         
         fio.linha.moveTo(x1, y1);
         fio.linha.lineTo(x2, y2);
@@ -145,16 +153,14 @@ class RedeDeIntencoes {
     
     // Anima todos os fios
     animarFios(delta) {
-        this.fiosPorCategoria.forEach((infoCategoria, categoria) => {
-            if (infoCategoria.fios) {
-                infoCategoria.fios.forEach(fio => {
-                    // Atualiza fase da pulsação apenas se não estiver ativo
-                    if (categoria !== this.categoriaAtiva) {
-                        fio.fasePulsacao += this.config.pulsacao.velocidade * delta;
-                    }
-                    this.atualizarFio(fio);
-                });
-            }
+        this.fiosPorCategoria.forEach((categoriaData, categoria) => {
+            categoriaData.fios.forEach(fio => {
+                // Atualiza fase da pulsação apenas se não estiver ativo
+                if (categoria !== this.categoriaAtiva) {
+                    fio.fasePulsacao += this.config.pulsacao.velocidade * delta;
+                }
+                this.atualizarFio(fio);
+            });
         });
     }
     
@@ -174,48 +180,40 @@ class RedeDeIntencoes {
         this.categoriaAtiva = categoria;
         this.destacarVelaClicada(idVelaClicada);
         
-        // Atualiza todos os fios desta categoria
-        const infoCategoria = this.fiosPorCategoria.get(categoria);
-        if (infoCategoria && infoCategoria.fios) {
-            infoCategoria.fios.forEach(fio => {
-                fio.estaAtivo = true;
-            });
-        }
+        console.log(`✨ Ativando categoria: "${categoria}"`);
         
         // Configura desativação automática
         this.timeoutAtivacao = setTimeout(() => {
             this.desativarCategoria();
+            console.log(`💫 Desativando categoria: "${categoria}"`);
         }, this.config.duracaoAtivacao);
     }
     
-    // Destaca a vela clicada
+    // Destaca a vela clicada (adiciona uma classe CSS ao ícone do marcador)
     destacarVelaClicada(idVela) {
-        // Encontra o elemento da vela (você pode adaptar conforme sua estrutura)
-        const elementoVela = document.querySelector(`[data-vela-id="${idVela}"]`);
-        if (elementoVela) {
-            elementoVela.classList.add('vela-destaque');
-            
-            // Remove o destaque após o tempo de ativação
-            setTimeout(() => {
-                elementoVela.classList.remove('vela-destaque');
-            }, this.config.duracaoAtivacao);
+        // O marcador é armazenado em `markers` global (do map.js)
+        if (window.markers && window.markers[idVela]) {
+            const marker = window.markers[idVela];
+            const iconElement = marker._icon;
+            if (iconElement) {
+                iconElement.classList.add('candle-highlighted');
+                
+                // Remove o destaque após o tempo de ativação
+                setTimeout(() => {
+                    iconElement.classList.remove('candle-highlighted');
+                }, this.config.duracaoAtivacao);
+            }
         }
     }
     
     // Remove destaque de uma categoria
     removerDestaqueCategoria(categoria) {
-        const infoCategoria = this.fiosPorCategoria.get(categoria);
-        if (infoCategoria && infoCategoria.fios) {
-            infoCategoria.fios.forEach(fio => {
-                fio.estaAtivo = false;
-            });
-        }
+        // Não é necessário fazer nada aqui, a animação já cuida
     }
     
     // Desativa a categoria atual
     desativarCategoria() {
         if (this.categoriaAtiva) {
-            this.removerDestaqueCategoria(this.categoriaAtiva);
             this.categoriaAtiva = null;
         }
     }
@@ -223,14 +221,34 @@ class RedeDeIntencoes {
     // Atualiza dimensões do canvas
     redimensionar() {
         this.app.renderer.resize(window.innerWidth, window.innerHeight);
+        // Não precisamos recalcular as posições aqui
+    }
+    
+    // Atualiza as posições dos fios (chamada quando o mapa se move ou amplia)
+    atualizarPosicoesFios() {
+        // Para cada vela em cada categoria, atualiza as coordenadas x e y
+        this.fiosPorCategoria.forEach((categoriaData, categoria) => {
+            categoriaData.velas.forEach(vela => {
+                // Busca o marcador correspondente
+                if (window.markers && window.markers[vela.id] && window.map) {
+                    const marker = window.markers[vela.id];
+                    const point = window.map.latLngToContainerPoint(marker.getLatLng());
+                    vela.x = point.x;
+                    vela.y = point.y;
+                }
+            });
+        });
         
-        // Recalcula posições de todos os fios
-        this.fiosPorCategoria.forEach((infoCategoria, categoria) => {
-            if (infoCategoria.fios) {
-                infoCategoria.fios.forEach(fio => {
-                    this.atualizarFio(fio);
-                });
-            }
+        // Redesenha todos os fios com as novas posições
+        this.redesenharTodosFios();
+    }
+    
+    // Redesenha todos os fios (útil após atualizar posições)
+    redesenharTodosFios() {
+        this.fiosPorCategoria.forEach((categoriaData, categoria) => {
+            categoriaData.fios.forEach(fio => {
+                this.atualizarFio(fio);
+            });
         });
     }
     
@@ -240,6 +258,31 @@ class RedeDeIntencoes {
         this.fiosContainer.removeChildren();
     }
 }
+
+// ========== FUNÇÕES GLOBAIS PARA INTEGRAÇÃO ==========
+
+// Conectar uma vela do mapa à rede (chamada pelo map.js)
+window.connectCandleToNetwork = function(candleInfo) {
+    if (!window.redeGlobal) {
+        window.redeGlobal = new RedeDeIntencoes();
+        console.log("✅ Rede de intenções inicializada");
+    }
+    
+    window.redeGlobal.adicionarVela({
+        id: candleInfo.id,
+        elementoDOM: candleInfo.element,
+        categoria: candleInfo.categoria,
+        x: candleInfo.x,
+        y: candleInfo.y
+    });
+};
+
+// Atualizar posições quando o mapa se mover (chamada pelo map.js)
+window.updateNetworkPositions = function() {
+    if (window.redeGlobal) {
+        window.redeGlobal.atualizarPosicoesFios();
+    }
+};
 
 // Exporta para uso global
 window.RedeDeIntencoes = RedeDeIntencoes;
