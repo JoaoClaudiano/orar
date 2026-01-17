@@ -3,8 +3,8 @@
 Um site para acender velas virtuais, compartilhar intenções de oração e conectar pessoas em oração pelo mundo.
 
 ## 🌐 Acesse o Site
-[[https://seu-usuario.github.io/oratorio-virtual](https://seu-usuario.github.io/oratorio-virtual)
-](https://joaoclaudiano.github.io/orar/)
+
+https://joaoclaudiano.github.io/orar/
 
 ## ✨ Funcionalidades
 
