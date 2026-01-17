@@ -389,3 +389,71 @@ function showToast(message, type = 'success') {
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
 });
+
+// ========== INTEGRAÇÃO COM REDE DE INTENÇÕES ==========
+
+// Função para obter todos os marcadores formatados para a rede
+window.getCandlesForNetwork = function() {
+    const candles = [];
+    
+    Object.keys(markers).forEach(candleId => {
+        const marker = markers[candleId];
+        const latlng = marker.getLatLng();
+        
+        // Converter coordenadas geográficas para pixels na tela
+        const point = map.latLngToContainerPoint(latlng);
+        
+        candles.push({
+            id: candleId,
+            element: marker._icon, // Elemento HTML do marcador
+            categoria: marker._candleData?.category || 'Geral',
+            x: point.x,
+            y: point.y,
+            latlng: latlng,
+            data: marker._candleData
+        });
+    });
+    
+    return candles;
+};
+
+// Atualizar a rede quando o mapa for movido/ampliado
+map.on('moveend zoomend', () => {
+    if (window.updateNetworkPositions) {
+        window.updateNetworkPositions();
+    }
+});
+
+// Modificar addCandleToMap para armazenar dados da vela no marcador
+function addCandleToMap(candleId, candle) {
+    // ... (código existente até criar o marcador) ...
+    
+    // Criar marcador (código existente)
+    const marker = L.marker([candle.location.lat, candle.location.lng], {
+        icon: candleIcon
+    }).addTo(map);
+    
+    // ARMAZENAR DADOS DA VELA NO MARCADOR (novo)
+    marker._candleData = candle;
+    marker._candleId = candleId;
+    
+    // ... (resto do código existente) ...
+    
+    // Conectar à rede quando o marcador for adicionado
+    setTimeout(() => {
+        if (window.connectCandleToNetwork && marker._icon) {
+            const point = map.latLngToContainerPoint(marker.getLatLng());
+            window.connectCandleToNetwork({
+                id: candleId,
+                element: marker._icon,
+                categoria: candle.category || 'Geral',
+                x: point.x,
+                y: point.y,
+                data: candle
+            });
+        }
+    }, 100);
+}
+
+
+
