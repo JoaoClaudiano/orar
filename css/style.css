@@ -716,6 +716,211 @@ body {
             0 8px 25px rgba(0,0,0,0.4);
     }
 }
+/* ========== ANIMAÇÕES ADICIONAIS PARA VELAS ========== */
 
+/* Efeito de brilho sutil ao redor da vela */
+.animated-candle::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: radial-gradient(circle at center, rgba(255,215,0,0.1), transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    animation: aura 3s infinite alternate;
+}
+
+@keyframes aura {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+}
+
+/* Diferentes estados da vela */
+.candle-new {
+    animation: new-candle 2s ease-out;
+}
+
+@keyframes new-candle {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Para velas prestes a expirar (último dia) */
+.candle-expiring .candle-flame {
+    animation: 
+        flame-flicker 0.8s infinite alternate,
+        flame-dance 1.5s infinite alternate,
+        expiring-flame 2s infinite alternate;
+    opacity: 0.6;
+}
+
+@keyframes expiring-flame {
+    0%, 100% {
+        height: 25px;
+    }
+    50% {
+        height: 15px;
+    }
+}
+
+/* ========== ESTILOS PARA O POPUP DAS VELAS ========== */
+/* Estes estilos são para os popups que aparecem quando clica nas velas */
+
+.prayer-popup {
+    min-width: 250px;
+    padding: 15px;
+}
+
+.prayer-intention {
+    font-size: 16px;
+    font-style: italic;
+    margin-bottom: 10px;
+    color: #333;
+    line-height: 1.4;
+}
+
+.prayer-details {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.prayer-details div {
+    margin-bottom: 5px;
+}
+
+.prayer-meta {
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+.pray-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+    width: 100%;
+    transition: transform 0.2s;
+    font-size: 14px;
+}
+
+.pray-button:hover {
+    transform: translateY(-2px);
+}
+
+/* ========== ESTILOS PARA TOAST (NOTIFICAÇÕES) ========== */
+/* Estes estilos são para as notificações que aparecem no canto superior direito */
+
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    z-index: 3000;
+    animation: slideIn 0.3s ease;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.toast.success {
+    background: #4CAF50;
+}
+
+.toast.error {
+    background: #f44336;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* ========== ESTILOS PARA O MAPA (se não existirem) ========== */
+/* Estes estilos já devem estar no seu index.html, mas vou adicionar aqui também */
+
+#map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1;
+    transition: filter 0.3s ease;
+}
+
+.map-dimmed {
+    filter: brightness(0.7) blur(2px);
+}
+
+/* ========== ESTILOS PARA OVERLAY DE BOAS-VINDAS ========== */
+/* Estes estilos já devem estar no seu index.html, mas vou adicionar aqui também */
+
+.welcome-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.welcome-modal {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
 
 
