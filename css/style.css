@@ -977,33 +977,43 @@ body {
     }
 }
 /* Destaque para vela clicada */
-.vela-destaque {
-    filter: 
-        drop-shadow(0 0 15px rgba(245, 230, 162, 0.8))
-        drop-shadow(0 0 30px rgba(255, 215, 0, 0.4))
-        brightness(1.3);
-    transform: scale(1.1);
-    transition: all 0.5s ease;
-    z-index: 10 !important;
-}
+/* ========== REDE DE INTENÇÕES ========== */
 
-/* Ajuste para o canvas */
-canvas {
-    pointer-events: none;
-    position: fixed;
+/* Canvas PixiJS sobre o mapa */
+#map canvas {
+    position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    pointer-events: none;
 }
 
-/* Garante que as velas sejam clicáveis */
-.vela-container {
-    position: relative;
-    z-index: 2;
+/* Destacar vela quando clicada na rede */
+.candle-highlighted {
+    animation: pulse-highlight 0.5s ease-in-out infinite alternate;
+    filter: brightness(1.5) drop-shadow(0 0 15px rgba(245, 230, 162, 0.8));
+    z-index: 1000 !important;
+}
+
+@keyframes pulse-highlight {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.15); }
+}
+
+/* Ajustes de z-index para compatibilidade */
+.leaflet-marker-icon {
+    z-index: 600;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: filter 0.3s ease, transform 0.3s ease;
 }
 
-.vela-container:hover {
-    transform: scale(1.05);
+.leaflet-popup {
+    z-index: 700;
+}
+
+.leaflet-map-pane {
+    z-index: 400;
 }
 
