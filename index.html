@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🕯️ Orar - Oratório Virtual</title>
+    
     <!-- Leaflet CSS (Mapa) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -19,124 +20,21 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    
-    <style>
-        /* Estilos específicos da página inicial */
-        #map {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 1;
-            transition: filter 0.3s ease;
-        }
-        
-        .map-dimmed {
-            filter: brightness(0.7) blur(2px);
-        }
-        
-        /* Marcadores personalizados */
-        .candle-marker {
-            background: none;
-            border: none;
-        }
-        
-        .candle-marker i {
-            font-size: 24px;
-            color: #FFD700;
-            text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF4500;
-            animation: flame-pulse 1.5s infinite alternate;
-        }
-        
-        @keyframes flame-pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.2); opacity: 1; }
-        }
-        
-        /* Popup personalizado */
-        .leaflet-popup-content-wrapper {
-            border-radius: 10px;
-            background: rgba(255, 253, 248, 0.95);
-            backdrop-filter: blur(10px);
-        }
-        
-        .prayer-popup {
-            min-width: 250px;
-            padding: 15px;
-        }
-        
-        .prayer-intention {
-            font-size: 16px;
-            font-style: italic;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .prayer-meta {
-            font-size: 12px;
-            color: #666;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-        
-        .pray-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-            width: 100%;
-            transition: transform 0.2s;
-        }
-        
-        .pray-button:hover {
-            transform: translateY(-2px);
-        }
-        
-        /* Overlay de boas-vindas */
-        .welcome-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        
-        .welcome-modal {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-    </style>
 </head>
 <body>
     <!-- Overlay de boas-vindas -->
     <div id="welcomeOverlay" class="welcome-overlay">
         <div class="welcome-modal">
-            <h1 style="color: #333; margin-bottom: 20px;">🕯️ Bem-vindo ao Orar</h1>
-            <p style="color: #666; margin-bottom: 30px;">
+            <h1 class="welcome-title">🕯️ Bem-vindo ao Orar</h1>
+            <p class="welcome-description">
                 Conecte-se com milhares em oração ao redor do mundo.<br>
                 Veja velas acesas em tempo real e compartilhe sua intenção.
             </p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <button id="exploreBtn" class="btn-primary" style="padding: 12px 30px;">
+            <div class="welcome-buttons">
+                <button id="exploreBtn" class="welcome-btn btn-primary">
                     <i class="fas fa-globe"></i> Explorar Mapa
                 </button>
-                <button id="lightFirstCandle" class="btn-secondary" style="padding: 12px 30px;">
+                <button id="lightFirstCandle" class="welcome-btn btn-secondary">
                     <i class="fas fa-fire"></i> Acender Vela
                 </button>
             </div>
@@ -299,7 +197,7 @@
                     <input type="checkbox" id="useMyLocation">
                     <label for="useMyLocation">Usar minha localização atual</label>
                 </div>
-                <div id="locationPreview" style="margin-top: 10px; display: none;">
+                <div id="locationPreview" class="location-preview">
                     <small>📍 Sua vela aparecerá em: <span id="locationText">Carregando...</span></small>
                 </div>
             </div>
