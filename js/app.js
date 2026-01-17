@@ -53,6 +53,43 @@ document.addEventListener('DOMContentLoaded', () => {
             welcomeOverlay.style.display = 'none';
             document.getElementById('map').classList.remove('map-dimmed');
         }
+        
+        // NOVO: Inicializar rede de intenções após o mapa carregar
+        initRedeDeIntencoes();
+    }
+    
+    // ========== INICIALIZAR REDE DE INTENÇÕES ==========
+    function initRedeDeIntencoes() {
+        // Esperar o mapa e os marcadores carregarem
+        setTimeout(() => {
+            if (window.redeGlobal) {
+                console.log('🕸️ Rede já inicializada');
+                return;
+            }
+            
+            // Criar instância da rede
+            window.redeGlobal = new RedeDeIntencoes();
+            console.log('✅ Rede de intenções inicializada');
+            
+            // Conectar velas existentes após breve delay
+            setTimeout(() => {
+                if (window.getCandlesForNetwork && window.connectCandleToNetwork) {
+                    try {
+                        const candles = window.getCandlesForNetwork();
+                        console.log(`🔗 Conectando ${candles.length} velas à rede...`);
+                        
+                        candles.forEach(candle => {
+                            window.connectCandleToNetwork(candle);
+                        });
+                        
+                        console.log(`✨ ${candles.length} velas conectadas à rede`);
+                    } catch (error) {
+                        console.error('Erro ao conectar velas à rede:', error);
+                    }
+                }
+            }, 1500);
+            
+        }, 2000); // Aguardar 2 segundos para o mapa carregar completamente
     }
     
     // ========== EVENT LISTENERS ==========
