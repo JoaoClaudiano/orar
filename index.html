@@ -5,546 +5,330 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🕯️ Orar - Oratório Virtual</title>
     
-    <!-- Firebase SDKs -->
+    <!-- Leaflet CSS (Mapa) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos Customizados -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     
     <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+        /* Estilos específicos da página inicial */
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+            transition: filter 0.3s ease;
         }
         
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a237e 0%, #4a148c 100%);
-            color: white;
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.6;
+        .map-dimmed {
+            filter: brightness(0.7) blur(2px);
         }
         
-        .container { 
-            max-width: 800px; 
-            margin: 0 auto; 
-            text-align: center; 
+        /* Marcadores personalizados */
+        .candle-marker {
+            background: none;
+            border: none;
         }
         
-        header { 
-            padding: 40px 0; 
+        .candle-marker i {
+            font-size: 24px;
+            color: #FFD700;
+            text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF4500;
+            animation: flame-pulse 1.5s infinite alternate;
         }
         
-        h1 { 
-            font-size: 3rem; 
-            color: #FFD54F; 
+        @keyframes flame-pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        /* Popup personalizado */
+        .leaflet-popup-content-wrapper {
+            border-radius: 10px;
+            background: rgba(255, 253, 248, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .prayer-popup {
+            min-width: 250px;
+            padding: 15px;
+        }
+        
+        .prayer-intention {
+            font-size: 16px;
+            font-style: italic;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #333;
         }
         
-        .subtitle { 
-            font-size: 1.2rem; 
-            opacity: 0.9; 
-            margin-bottom: 30px; 
-        }
-        
-        .github-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+        .prayer-meta {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
             margin-top: 10px;
         }
         
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-        
-        .stat {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
-            min-width: 150px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: transform 0.3s;
-        }
-        
-        .stat:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            display: block;
-            color: #FFD54F;
-        }
-        
-        .candle-container {
-            margin: 40px 0;
-        }
-        
-        .candle {
-            width: 60px;
-            height: 100px;
-            margin: 0 auto 20px;
-            position: relative;
-        }
-        
-        .flame {
-            width: 15px;
-            height: 30px;
-            background: linear-gradient(to bottom, #FF9800, #FF5722);
-            border-radius: 50% 50% 20% 20%;
-            margin: 0 auto;
-            animation: flicker 1.5s infinite alternate;
-            box-shadow: 0 0 20px #FF9800, 0 0 40px #FF9800;
-        }
-        
-        .wax {
-            width: 100%;
-            height: 70px;
-            background: linear-gradient(to right, #FFF8E1, #FFECB3);
-            border-radius: 5px;
-            margin-top: 5px;
-        }
-        
-        @keyframes flicker {
-            0%, 100% { 
-                transform: scale(1); 
-                opacity: 0.9; 
-            }
-            50% { 
-                transform: scale(1.1); 
-                opacity: 1; 
-            }
-        }
-        
-        .btn {
-            background: linear-gradient(to right, #FFD54F, #FFB300);
-            color: #333;
+        .pray-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            border-radius: 50px;
+            padding: 8px 15px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
-            margin: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(255, 213, 79, 0.3);
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(255, 213, 79, 0.4);
-        }
-        
-        .form-container {
-            background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 15px;
-            margin: 30px 0;
-            display: none;
-            text-align: left;
-            backdrop-filter: blur(10px);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        
-        input, select, textarea {
+            margin-top: 10px;
             width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.1);
-            color: white;
-            margin-top: 5px;
-            font-size: 1rem;
+            transition: transform 0.2s;
         }
         
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #FFD54F;
-            box-shadow: 0 0 10px rgba(255, 213, 79, 0.3);
+        .pray-button:hover {
+            transform: translateY(-2px);
         }
         
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .btn-group {
+        /* Overlay de boas-vindas */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
             display: flex;
-            gap: 10px;
-            margin-top: 30px;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
         }
         
-        footer {
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        
-        @media (max-width: 600px) {
-            h1 { 
-                font-size: 2.2rem; 
-            }
-            .stats { 
-                flex-direction: column; 
-                align-items: center; 
-            }
-            .stat { 
-                width: 100%; 
-                max-width: 300px; 
-            }
-            .btn-group {
-                flex-direction: column;
-            }
+        .welcome-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🕯️ Orar</h1>
-            <p class="subtitle">Oratório Virtual - Acenda sua vela de intenção</p>
-            <div class="github-badge">
-                🌐 <strong>orar</strong> | 🔥 <strong>orar-b23db</strong>
-            </div>
-        </header>
-        
-        <div class="stats">
-            <div class="stat">
-                <span class="stat-number" id="totalCandles">0</span>
-                <span>Velas Acesas</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number" id="liveCandles">0</span>
-                <span>Online Agora</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number" id="prayersToday">1,247</span>
-                <span>Orações Hoje</span>
-            </div>
-        </div>
-        
-        <div class="candle-container">
-            <div class="candle">
-                <div class="flame"></div>
-                <div class="wax"></div>
-            </div>
-            
-            <button class="btn" id="lightCandleBtn">
-                ✨ Acender uma Vela
-            </button>
-            
-            <button class="btn" id="viewWallBtn" style="background: rgba(255,255,255,0.1); color: white;">
-                👁️ Ver Mural de Orações
-            </button>
-        </div>
-        
-        <div id="candleForm" class="form-container">
-            <h3 style="text-align: center; margin-bottom: 20px; color: #FFD54F;">
-                Acender Vela Virtual
-            </h3>
-            
-            <div class="form-group">
-                <label for="intention">Sua Intenção *</label>
-                <textarea id="intention" placeholder="Escreva seu pedido, agradecimento ou intenção de oração..."></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="forWho">Para quem é?</label>
-                <select id="forWho">
-                    <option value="self">Para mim</option>
-                    <option value="family">Para minha família</option>
-                    <option value="friend">Para um amigo</option>
-                    <option value="world">Pela paz no mundo</option>
-                    <option value="memory">Em memória</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="visibility">Visibilidade</label>
-                <select id="visibility">
-                    <option value="private">🔒 Privada (só eu vejo)</option>
-                    <option value="anonymous">👤 Anônima (no mural sem nome)</option>
-                    <option value="public">🌍 Pública (todos veem)</option>
-                </select>
-            </div>
-            
-            <div class="btn-group">
-                <button class="btn" id="submitCandleBtn" style="flex: 1;">
-                    ✅ Acender Vela
-                </button>
-                <button class="btn" id="cancelBtn" style="background: rgba(255,255,255,0.1); color: white; flex: 1;">
-                    ❌ Cancelar
-                </button>
-            </div>
-        </div>
-        
-        <div style="margin: 40px 0;">
-            <h3>✨ Como funciona?</h3>
-            <div style="margin-top: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
-                <p style="margin-bottom: 10px;">1. <strong>Escreva sua intenção</strong> - Pode ser um pedido, agradecimento ou memória</p>
-                <p style="margin-bottom: 10px;">2. <strong>Escolha a privacidade</strong> - Privada, anônima ou pública</p>
-                <p style="margin-bottom: 10px;">3. <strong>Sua vela ficará acesa 7 dias</strong> - Simbolicamente no nosso oratório</p>
-                <p style="margin-bottom: 10px;">4. <strong>Outros podem orar por você</strong> - Se escolher pública ou anônima</p>
-            </div>
-        </div>
-        
-        <footer>
-            <p>Orar - Oratório Virtual © 2024</p>
-            <p style="margin-top: 10px; font-size: 0.8rem;">
-                Hospedado no GitHub: <strong>orar</strong> | 
-                Firebase: <strong>orar-b23db</strong> | 
-                Status: <span id="firebaseStatus" style="color: #4CAF50;">● Conectado</span>
+    <!-- Overlay de boas-vindas -->
+    <div id="welcomeOverlay" class="welcome-overlay">
+        <div class="welcome-modal">
+            <h1 style="color: #333; margin-bottom: 20px;">🕯️ Bem-vindo ao Orar</h1>
+            <p style="color: #666; margin-bottom: 30px;">
+                Conecte-se com milhares em oração ao redor do mundo.<br>
+                Veja velas acesas em tempo real e compartilhe sua intenção.
             </p>
-        </footer>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="exploreBtn" class="btn-primary" style="padding: 12px 30px;">
+                    <i class="fas fa-globe"></i> Explorar Mapa
+                </button>
+                <button id="lightFirstCandle" class="btn-secondary" style="padding: 12px 30px;">
+                    <i class="fas fa-fire"></i> Acender Vela
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- Firebase Configuration -->
-    <script>
-        // Firebase Configuration - CORRIGIDO
-        const firebaseConfig = {
-            apiKey: "AIzaSyDNDAOqdCVsk4w2aEdLR_ihsrhqASacDpw",
-            authDomain: "orar-b23db.firebaseapp.com",
-            projectId: "orar-b23db",
-            storageBucket: "orar-b23db.firebasestorage.app",
-            messagingSenderId: "552018175417",
-            appId: "1:552018175417:web:fc7606ec957128685b4268",
-            measurementId: "G-SMHCL4S3RY"
-        };
-        
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        
-        console.log("✅ Firebase inicializado: Projeto 'orar-b23db'");
-        
-        // Global variables - CORRETO (sem erro de atribuição)
-        window.firebaseApp = app;
-        window.firebaseDb = db;
-        window.firebaseAuth = auth;
-    </script>
+    <!-- Mapa -->
+    <div id="map" class="map-dimmed"></div>
     
-    <!-- Main Application Logic -->
-    <script>
-        // DOM Elements
-        const lightCandleBtn = document.getElementById('lightCandleBtn');
-        const viewWallBtn = document.getElementById('viewWallBtn');
-        const candleForm = document.getElementById('candleForm');
-        const submitCandleBtn = document.getElementById('submitCandleBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const intentionInput = document.getElementById('intention');
-        const forWhoSelect = document.getElementById('forWho');
-        const visibilitySelect = document.getElementById('visibility');
+    <!-- Card Flutuante de Controles -->
+    <div id="controlCard" class="floating-card">
+        <div class="card-header">
+            <h2>🕯️ Oratório Virtual</h2>
+            <div class="card-actions">
+                <button id="toggleCard" class="icon-btn">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <button id="closeCard" class="icon-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
         
-        // Initialize Firebase connection
-        function initFirebase() {
-            try {
-                // Test Firebase connection
-                if (window.firebaseDb) {
-                    console.log("Firebase conectado com sucesso!");
-                    
-                    // Listen for real-time candle count
-                    const candlesRef = firebase.firestore().collection('candles');
-                    
-                    candlesRef.onSnapshot((snapshot) => {
-                        const count = snapshot.size;
-                        document.getElementById('totalCandles').textContent = count;
-                        document.getElementById('liveCandles').textContent = Math.max(1, Math.floor(count / 3));
-                    });
-                    
-                    // Update status
-                    document.getElementById('firebaseStatus').textContent = '● Conectado';
-                    document.getElementById('firebaseStatus').style.color = '#4CAF50';
-                    
-                    return true;
-                }
-            } catch (error) {
-                console.error("Erro ao conectar ao Firebase:", error);
-                document.getElementById('firebaseStatus').textContent = '○ Erro de conexão';
-                document.getElementById('firebaseStatus').style.color = '#f44336';
-                return false;
-            }
-        }
-        
-        // Show candle form
-        function showCandleForm() {
-            candleForm.style.display = 'block';
-            window.scrollTo({
-                top: candleForm.offsetTop - 50,
-                behavior: 'smooth'
-            });
-            intentionInput.focus();
-        }
-        
-        // Hide candle form
-        function hideCandleForm() {
-            candleForm.style.display = 'none';
-            intentionInput.value = '';
-        }
-        
-        // Submit candle to Firebase
-        async function submitCandle() {
-            const intention = intentionInput.value.trim();
+        <div class="card-body">
+            <!-- Seção de Estatísticas -->
+            <div class="stats-section">
+                <h3><i class="fas fa-chart-line"></i> Estatísticas ao Vivo</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalCandles">0</span>
+                        <span class="stat-label">Velas Acesas</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="onlineNow">0</span>
+                        <span class="stat-label">Online Agora</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="countriesCount">0</span>
+                        <span class="stat-label">Países</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="prayersToday">0</span>
+                        <span class="stat-label">Orações Hoje</span>
+                    </div>
+                </div>
+            </div>
             
-            if (!intention) {
-                alert('Por favor, escreva sua intenção de oração.');
-                return;
-            }
+            <!-- Seção de Ações -->
+            <div class="actions-section">
+                <h3><i class="fas fa-compass"></i> Ações Rápidas</h3>
+                <div class="actions-grid">
+                    <button id="lightCandleBtn" class="action-btn primary">
+                        <i class="fas fa-fire"></i> Acender Vela
+                    </button>
+                    <button id="findMyLocation" class="action-btn secondary">
+                        <i class="fas fa-location-dot"></i> Minha Localização
+                    </button>
+                    <button id="toggleMapBtn" class="action-btn secondary">
+                        <i class="fas fa-map"></i> Foco no Mapa
+                    </button>
+                    <button id="viewWallBtn" class="action-btn secondary">
+                        <i class="fas fa-th-large"></i> Ver Mural
+                    </button>
+                </div>
+            </div>
             
-            if (intention.length < 5) {
-                alert('Sua intenção precisa ter pelo menos 5 caracteres.');
-                return;
-            }
+            <!-- Filtros do Mapa -->
+            <div class="filters-section">
+                <h3><i class="fas fa-filter"></i> Filtros</h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" id="filterPublic" checked> 
+                        <span>Velas Públicas</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="filterRecent" checked> 
+                        <span>Últimas 24h</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="filterByCategory"> 
+                        <span>Por Categoria</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer do Card -->
+        <div class="card-footer">
+            <div class="connection-status">
+                <span id="firebaseStatus">● Conectado</span>
+                <span id="mapStatus">🗺️ Mapa Carregado</span>
+            </div>
+            <button id="expandMap" class="text-btn">
+                <i class="fas fa-expand"></i> Tela Cheia
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal para Acender Vela -->
+    <div id="candleModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fas fa-fire"></i> Acender Vela Virtual</h2>
             
-            try {
-                // Check Firebase connection
-                if (!window.firebaseDb) {
-                    throw new Error("Firebase não está conectado");
-                }
-                
-                // Prepare candle data
-                const candleData = {
-                    intention: intention,
-                    forWho: forWhoSelect.value,
-                    visibility: visibilitySelect.value,
-                    createdAt: new Date().toISOString(),
-                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
-                    prayerCount: 0,
-                    isActive: true
-                };
-                
-                // Save to Firestore
-                const docRef = await firebase.firestore()
-                    .collection('candles')
-                    .add(candleData);
-                
-                console.log("Vela salva com ID:", docRef.id);
-                
-                // Animation effect
-                const flame = document.querySelector('.flame');
-                flame.style.animation = 'none';
-                setTimeout(() => {
-                    flame.style.animation = 'flicker 1.5s infinite alternate';
-                    flame.style.boxShadow = '0 0 30px #FF9800, 0 0 50px #FF9800';
-                }, 10);
-                
-                // Success message
-                const messages = [
-                    "Sua vela foi acesa com sucesso! ✨",
-                    "Sua intenção está em nossas orações. 🙏",
-                    "Que sua luz ilumine muitos corações. 💛",
-                    "Sua fé conecta você a milhares. 🌍"
-                ];
-                
-                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                alert(`✅ ${randomMessage}\n\n"${intention.substring(0, 60)}${intention.length > 60 ? '...' : ''}"`);
-                
-                // Reset form
-                hideCandleForm();
-                
-            } catch (error) {
-                console.error("Erro ao salvar vela:", error);
-                
-                // Fallback: simulate success if Firebase fails
-                if (error.message.includes("permission") || error.message.includes("Firebase")) {
-                    alert("⚠️ Modo offline ativado\n\nSua vela foi acesa localmente. Quando a conexão voltar, ela será sincronizada.");
-                    
-                    // Local storage fallback
-                    const localCandles = JSON.parse(localStorage.getItem('orar_candles') || '[]');
-                    localCandles.push({
-                        intention: intention,
-                        forWho: forWhoSelect.value,
-                        visibility: visibilitySelect.value,
-                        createdAt: new Date().toISOString()
-                    });
-                    localStorage.setItem('orar_candles', JSON.stringify(localCandles));
-                    
-                    // Update counter locally
-                    const currentCount = parseInt(document.getElementById('totalCandles').textContent) || 0;
-                    document.getElementById('totalCandles').textContent = currentCount + 1;
-                    
-                    hideCandleForm();
-                } else {
-                    alert("Erro ao salvar sua vela. Por favor, tente novamente.");
-                }
-            }
-        }
-        
-        // View prayer wall
-        function viewWall() {
-            alert('🧱 Mural de Orações\n\nEm breve você verá aqui todas as velas públicas acesas por pessoas ao redor do mundo!\n\n🌟 Funcionalidade em desenvolvimento...');
-        }
-        
-        // Update prayers today counter
-        function updatePrayersToday() {
-            const now = new Date();
-            const hour = now.getHours();
-            // Simulate growing prayers throughout the day
-            const basePrayers = 1000;
-            const prayers = basePrayers + (hour * 42);
-            document.getElementById('prayersToday').textContent = prayers.toLocaleString();
-        }
-        
-        // Event Listeners
-        lightCandleBtn.addEventListener('click', showCandleForm);
-        viewWallBtn.addEventListener('click', viewWall);
-        submitCandleBtn.addEventListener('click', submitCandle);
-        cancelBtn.addEventListener('click', hideCandleForm);
-        
-        // Allow Enter key in textarea
-        intentionInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                submitCandle();
-            }
-        });
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Firebase
-            initFirebase();
+            <div class="form-section">
+                <label for="candleIntention">Sua Intenção de Oração *</label>
+                <textarea id="candleIntention" 
+                          placeholder="Escreva seu pedido, agradecimento ou intenção..." 
+                          rows="4"></textarea>
+            </div>
             
-            // Update counters
-            updatePrayersToday();
-            setInterval(updatePrayersToday, 60000); // Update every minute
+            <div class="form-row">
+                <div class="form-section">
+                    <label for="candleCategory">Categoria</label>
+                    <select id="candleCategory">
+                        <option value="health">Saúde</option>
+                        <option value="family">Família</option>
+                        <option value="work">Trabalho/Emprego</option>
+                        <option value="peace">Paz Interior</option>
+                        <option value="gratitude">Gratidão</option>
+                        <option value="memory">Em Memória</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </div>
+                
+                <div class="form-section">
+                    <label for="candleSaint">Intercessor (Opcional)</label>
+                    <select id="candleSaint">
+                        <option value="">Escolha um intercessor...</option>
+                        <option value="sao_judas">São Judas Tadeu</option>
+                        <option value="ns_aparecida">Nossa Senhora Aparecida</option>
+                        <option value="santa_rita">Santa Rita de Cássia</option>
+                        <option value="santo_antonio">Santo Antônio</option>
+                        <option value="anjo_guardiao">Anjo da Guarda</option>
+                        <option value="universal">Energia Universal</option>
+                    </select>
+                </div>
+            </div>
             
-            // Animate flame periodically
-            setInterval(() => {
-                const flame = document.querySelector('.flame');
-                flame.style.animation = 'none';
-                setTimeout(() => {
-                    flame.style.animation = 'flicker 1.5s infinite alternate';
-                }, 100);
-            }, 10000);
+            <div class="form-section">
+                <label>Visibilidade</label>
+                <div class="visibility-options">
+                    <label class="visibility-option">
+                        <input type="radio" name="visibility" value="public" checked>
+                        <span>🌍 Pública (no mapa e mural)</span>
+                    </label>
+                    <label class="visibility-option">
+                        <input type="radio" name="visibility" value="anonymous">
+                        <span>👤 Anônima (só no mapa)</span>
+                    </label>
+                    <label class="visibility-option">
+                        <input type="radio" name="visibility" value="private">
+                        <span>🔒 Privada (só você vê)</span>
+                    </label>
+                </div>
+            </div>
             
-            // Check for locally stored candles
-            const localCandles = JSON.parse(localStorage.getItem('orar_candles') || '[]');
-            if (localCandles.length > 0) {
-                console.log(`${localCandles.length} velas armazenadas localmente`);
-            }
-        });
-    </script>
+            <div class="form-section">
+                <label>Localização no Mapa</label>
+                <div class="location-option">
+                    <input type="checkbox" id="useMyLocation">
+                    <label for="useMyLocation">Usar minha localização atual</label>
+                </div>
+                <div id="locationPreview" style="margin-top: 10px; display: none;">
+                    <small>📍 Sua vela aparecerá em: <span id="locationText">Carregando...</span></small>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="submitCandle" class="btn-primary">
+                    <i class="fas fa-check"></i> Acender Vela
+                </button>
+                <button id="cancelCandle" class="btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botão Flutuante para Menu -->
+    <button id="menuToggle" class="floating-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Leaflet JS (Mapa) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    
+    <!-- Scripts do Projeto -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
