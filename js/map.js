@@ -3,6 +3,12 @@ let map = null;
 let markers = {};
 let userMarker = null;
 
+// EXPORTA MARCADORES GLOBALMENTE (LINHA CRÍTICA 1)
+window.markers = markers;
+// EXPORTA MAPA GLOBALMENTE (LINHA CRÍTICA 2)
+window.map = null;
+
+
 // Inicializar o mapa
 function initMap() {
     // Criar mapa mundial
