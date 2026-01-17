@@ -181,11 +181,55 @@
             opacity: 0.7;
         }
         
+        /* Formulário */
+        .form-container {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 600px;
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
         /* Responsivo */
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .stats { grid-template-columns: 1fr; }
             .features { grid-template-columns: 1fr; }
+            .form-actions { flex-direction: column; }
         }
     </style>
 </head>
@@ -232,7 +276,7 @@
                 Sua vela permanecerá acesa virtualmente por 7 dias. Compartilhe com amigos e familiares para orarem juntos.
             </p>
             
-            <button class="btn" onclick="lightCandle()">
+            <button class="btn" onclick="showCandleForm()">
                 <i class="fas fa-fire"></i> Acender uma Vela
             </button>
             
@@ -242,6 +286,60 @@
                 </button>
             </div>
         </section>
+        
+        <!-- FORMULÁRIO PARA ACENDER VELA -->
+        <div id="candleForm" class="form-container">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #FFD54F;">Acender Vela Virtual</h2>
+            
+            <div class="form-group">
+                <label for="intention">Sua Intenção de Oração *</label>
+                <textarea id="intention" placeholder="Descreva sua intenção, motivo ou pedido de oração..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">Categoria</label>
+                <select id="category">
+                    <option value="saude">Saúde</option>
+                    <option value="familia">Família</option>
+                    <option value="emprego">Emprego/Trabalho</option>
+                    <option value="paz">Paz Interior</option>
+                    <option value="gratidao">Gratidão</option>
+                    <option value="memoria">Em Memória</option>
+                    <option value="outro">Outro</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="saint">Intercessor (Opcional)</label>
+                <select id="saint">
+                    <option value="">Nenhum específico</option>
+                    <option value="sao-judas">São Judas Tadeu</option>
+                    <option value="ns-aparecida">Nossa Senhora Aparecida</option>
+                    <option value="sao-joao">São João Batista</option>
+                    <option value="santa-rita">Santa Rita de Cássia</option>
+                    <option value="santo-antonio">Santo Antônio</option>
+                    <option value="universo">Enviar ao Universo</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="visibility">Visibilidade</label>
+                <select id="visibility">
+                    <option value="private">🔒 Privada (só você vê)</option>
+                    <option value="anonymous">👥 Anônima (no mural sem nome)</option>
+                    <option value="public">🌍 Pública (nome e intenção visíveis)</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn" onclick="submitCandle()" style="flex: 1;">
+                    <i class="fas fa-check"></i> Acender Vela
+                </button>
+                <button class="btn" onclick="hideCandleForm()" style="background: rgba(255,255,255,0.1); color: white; flex: 1;">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
         
         <div class="features">
             <div class="feature-card">
@@ -269,79 +367,81 @@
             </div>
         </div>
         
-        <div id="candleForm" style="display: none; background: rgba(255,255,255,0.05); padding: 30px; border-radius: 15px; margin: 40px 0;">
-            <h3 style="margin-bottom: 20px; color: #FFD54F;">Acender Vela</h3>
-            <div style="display: grid; gap: 15px; max-width: 500px; margin: 0 auto;">
-                <input type="text" id="intention" placeholder="Sua intenção (ex: saúde da família)" style="padding: 15px; border-radius: 10px; border: none; font-size: 1rem;">
-                <select id="saint" style="padding: 15px; border-radius: 10px; border: none; font-size: 1rem;">
-                    <option value="">Escolha um intercessor (opcional)</option>
-                    <option value="sao-judas">São Judas Tadeu</option>
-                    <option value="ns-aparecida">Nossa Senhora Aparecida</option>
-                    <option value="sao-joao">São João Batista</option>
-                    <option value="santa-rita">Santa Rita de Cássia</option>
-                    <option value="universo">Enviar ao Universo</option>
-                </select>
-                <select id="visibility" style="padding: 15px; border-radius: 10px; border: none; font-size: 1rem;">
-                    <option value="private">🔒 Vela Privada (só você vê)</option>
-                    <option value="community">👥 Comunidade (anônima)</option>
-                    <option value="public">🌍 Pública (nome e intenção visíveis)</option>
-                </select>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="submitCandle()" class="btn" style="flex: 1;">
-                        <i class="fas fa-check"></i> Acender Vela
-                    </button>
-                    <button onclick="closeForm()" class="btn" style="background: rgba(255,255,255,0.1); color: white; flex: 1;">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
-        
         <footer>
             <p>Oratório Virtual © 2024 | Site hospedado no GitHub Pages</p>
             <p style="margin-top: 10px; font-size: 0.8rem;">
-                Este é um protótipo. Para versão completa com banco de dados, use Firebase Hosting.
+                Conexão Firebase ativa | Projeto desenvolvido com ❤️
             </p>
         </footer>
     </div>
     
-    <script>
-        // Configuração do Firebase (você precisa colocar SUAS credenciais aqui)
-        // Vá no Firebase Console → Configurações do projeto → Apps → Web
-        // Copie o firebaseConfig e cole abaixo:
+    <!-- Firebase SDK -->
+    <script type="module">
+        // SUAS CREDENCIAIS FIREBASE - JÁ CONFIGURADAS
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY_AQUI",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJETO_ID",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
+            apiKey: "AIzaSyDNDAOqdCVsk4w2aEdLR_ihsrhqASacDpw",
+            authDomain: "orar-b23db.firebaseapp.com",
+            projectId: "orar-b23db",
+            storageBucket: "orar-b23db.firebasestorage.app",
+            messagingSenderId: "552018175417",
+            appId: "1:552018175417:web:fc7606ec957128685b4268",
+            measurementId: "G-SMHCL4S3RY"
         };
         
-        // Inicializar Firebase (comente se ainda não tiver credenciais)
-        // firebase.initializeApp(firebaseConfig);
-        // const db = firebase.firestore();
-        // const auth = firebase.auth();
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
         
-        // Simulação de dados (REMOVA quando conectar ao Firebase real)
-        function updateStats() {
-            document.getElementById('totalCandles').textContent = 
-                Math.floor(Math.random() * 2000) + 1000;
-            document.getElementById('liveCandles').textContent = 
-                Math.floor(Math.random() * 200) + 50;
-            document.getElementById('countries').textContent = 
-                Math.floor(Math.random() * 50) + 30;
-            document.getElementById('prayers').textContent = 
-                Math.floor(Math.random() * 8000) + 5000;
-        }
+        // Tornar disponível globalmente
+        window.firebaseApp = app;
+        window.firebaseDb = db;
+        window.firebaseAuth = auth;
         
-        // Atualizar estatísticas a cada 10 segundos
-        setInterval(updateStats, 10000);
-        updateStats();
+        console.log("Firebase conectado com sucesso!");
         
+        // Login anônimo automático
+        signInAnonymously(auth)
+            .then(() => {
+                console.log("Usuário anônimo autenticado");
+            })
+            .catch((error) => {
+                console.error("Erro na autenticação anônima:", error);
+            });
+            
+        // Função para salvar vela no Firestore
+        window.saveCandleToFirebase = async (candleData) => {
+            try {
+                const docRef = await addDoc(collection(db, "candles"), {
+                    ...candleData,
+                    createdAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias
+                    prayerCount: 0
+                });
+                console.log("Vela salva com ID: ", docRef.id);
+                return docRef.id;
+            } catch (error) {
+                console.error("Erro ao salvar vela: ", error);
+                throw error;
+            }
+        };
+        
+        // Função para contar velas em tempo real
+        const candlesCollection = collection(db, "candles");
+        onSnapshot(candlesCollection, (snapshot) => {
+            const candleCount = snapshot.size;
+            document.getElementById('totalCandles').textContent = candleCount.toLocaleString();
+            document.getElementById('liveCandles').textContent = Math.floor(candleCount / 10);
+        });
+    </script>
+    
+    <script>
         // Funções do site
-        function lightCandle() {
+        function showCandleForm() {
             document.getElementById('candleForm').style.display = 'block';
             window.scrollTo({
                 top: document.getElementById('candleForm').offsetTop - 100,
@@ -349,49 +449,69 @@
             });
         }
         
-        function closeForm() {
+        function hideCandleForm() {
             document.getElementById('candleForm').style.display = 'none';
+            document.getElementById('intention').value = '';
         }
         
-        function submitCandle() {
-            const intention = document.getElementById('intention').value;
+        async function submitCandle() {
+            const intention = document.getElementById('intention').value.trim();
+            const category = document.getElementById('category').value;
             const saint = document.getElementById('saint').value;
             const visibility = document.getElementById('visibility').value;
             
             if (!intention) {
-                alert('Por favor, escreva sua intenção.');
+                alert('Por favor, escreva sua intenção de oração.');
                 return;
             }
             
-            // Aqui você conectaria com o Firebase para salvar
-            // Exemplo com Firebase (descomente quando configurar):
-            /*
-            db.collection('candles').add({
-                intention: intention,
-                saint: saint,
-                visibility: visibility,
-                litAt: new Date(),
-                userId: auth.currentUser ? auth.currentUser.uid : 'anonymous'
-            }).then(() => {
-                alert('Vela acesa com sucesso! Sua intenção está em nossas orações.');
-                closeForm();
-            });
-            */
-            
-            // Simulação (REMOVA quando usar Firebase)
-            alert(`Vela acesa com sucesso!\nIntenção: ${intention}\nIntercessor: ${saint || 'Não especificado'}\nVisibilidade: ${visibility}`);
-            closeForm();
-            
-            // Atualizar contador
-            const current = parseInt(document.getElementById('totalCandles').textContent.replace(',', ''));
-            document.getElementById('totalCandles').textContent = (current + 1).toLocaleString();
+            try {
+                const candleData = {
+                    intention: intention,
+                    category: category,
+                    saint: saint,
+                    visibility: visibility,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Usar a função do Firebase que definimos
+                if (window.saveCandleToFirebase) {
+                    const candleId = await window.saveCandleToFirebase(candleData);
+                    
+                    // Mostrar mensagem de sucesso
+                    alert(`✅ Vela acesa com sucesso!\n\nSua intenção "${intention}" foi registrada e estará em nossas orações pelos próximos 7 dias.`);
+                    
+                    // Animar a vela
+                    const flame = document.querySelector('.flame');
+                    flame.style.animation = 'none';
+                    setTimeout(() => {
+                        flame.style.animation = 'flicker 1.5s infinite alternate';
+                    }, 10);
+                    
+                    hideCandleForm();
+                } else {
+                    throw new Error("Firebase não inicializado");
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                alert("Erro ao acender vela. Tente novamente.");
+            }
         }
         
         function viewWall() {
-            alert('Em breve: Mural de Orações com velas de todo o mundo!');
+            alert('Mural de Orações em desenvolvimento! Em breve você verá todas as velas acesas.');
         }
         
-        // Animar vela
+        // Atualizar estatísticas simuladas
+        function updateStats() {
+            const live = parseInt(document.getElementById('liveCandles').textContent.replace(',', '')) || 0;
+            document.getElementById('liveCandles').textContent = (live + Math.floor(Math.random() * 3)).toLocaleString();
+            document.getElementById('prayers').textContent = (Math.floor(Math.random() * 1000) + 5000).toLocaleString();
+        }
+        
+        setInterval(updateStats, 10000);
+        
+        // Animar vela principal
         const flame = document.querySelector('.flame');
         setInterval(() => {
             flame.style.animation = 'none';
