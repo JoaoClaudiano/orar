@@ -8,7 +8,6 @@ function initMap() {
     // Criar mapa mundial
     map = L.map('map').setView([20, 0], 2);
     
-    
     // Adicionar camada do mapa (dark mode para melhor contraste)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '©OpenStreetMap, ©CartoDB',
@@ -50,7 +49,6 @@ function loadCandlesToMap() {
 }
 
 // Adicionar uma vela ao mapa
-// Substitua a função addCandleToMap com esta versão melhorada:
 function addCandleToMap(candleId, candle) {
     // Se já existe, remover primeiro
     if (markers[candleId]) {
@@ -90,9 +88,23 @@ function addCandleToMap(candleId, candle) {
         }
     }
     
+    // Verificar status da vela
+    const createdAt = new Date(candle.createdAt);
+    const expiresAt = new Date(candle.expiresAt);
+    const now = new Date();
+    const hoursLeft = (expiresAt - now) / (1000 * 60 * 60);
+    
+    // Adicionar classes baseadas no status
+    let statusClass = '';
+    if (hoursLeft < 24) {
+        statusClass = 'candle-expiring';
+    } else if ((now - createdAt) < (1000 * 60 * 60)) { // Menos de 1 hora
+        statusClass = 'candle-new';
+    }
+    
     // Criar HTML personalizado para o marcador
     const candleHtml = `
-        <div class="animated-candle">
+        <div class="animated-candle ${statusClass}">
             <div class="candle-flame" style="
                 background: linear-gradient(to bottom, ${flameColor}, #FF8C00);
                 box-shadow: 0 0 20px ${flameColor}, 0 0 40px ${flameColor};
@@ -205,22 +217,31 @@ function addUserLocationMarker(lat, lng) {
         map.removeLayer(userMarker);
     }
     
-    // Criar ícone personalizado para usuário
+    // Criar HTML para marcador do usuário
+    const userHtml = `
+        <div class="user-marker">
+            <div class="user-marker-pulse"></div>
+            <div class="user-marker-dot"></div>
+        </div>
+    `;
+    
+    // Criar ícone personalizado
     const userIcon = L.divIcon({
-        className: 'user-marker',
-        html: '<i class="fas fa-user" style="color: #4CAF50; font-size: 20px;"></i>',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
+        className: 'user-marker-icon',
+        html: userHtml,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
     });
     
     // Adicionar marcador
-    userMarker = L.marker([lat, lng], { icon: userIcon })
-        .addTo(map)
-        .bindPopup('<b>Sua localização atual</b>')
-        .openPopup();
+    userMarker = L.marker([lat, lng], { 
+        icon: userIcon,
+        zIndexOffset: 1000  // Garantir que fique acima das velas
+    }).addTo(map);
     
     // Centralizar no usuário
-    map.setView([lat, lng], 8);
+    map.setView([lat, lng], 10);
     
     return { lat, lng };
 }
@@ -254,7 +275,6 @@ function setupMapEvents() {
     // Clicar no mapa para adicionar marcador temporário
     map.on('click', (e) => {
         if (window.isSettingLocation) {
-            // Se o usuário está escolhendo uma localização manualmente
             const lat = e.latlng.lat;
             const lng = e.latlng.lng;
             
@@ -264,17 +284,25 @@ function setupMapEvents() {
             }
             
             // Adicionar marcador temporário
-            L.marker([lat, lng], {
+            const tempMarker = L.marker([lat, lng], {
                 icon: L.divIcon({
-                    className: 'temp-marker',
-                    html: '<i class="fas fa-map-pin" style="color: #FF9800; font-size: 24px;"></i>',
+                    className: 'temp-marker-icon',
+                    html: '<div class="temp-marker"><div class="temp-marker-pin"></div></div>',
                     iconSize: [30, 30],
                     iconAnchor: [15, 30]
-                })
+                }),
+                zIndexOffset: 900
             })
             .addTo(map)
-            .bindPopup('Localização selecionada')
+            .bindPopup('📍 Localização selecionada')
             .openPopup();
+            
+            // Remover marcador temporário após 5 segundos
+            setTimeout(() => {
+                if (tempMarker) {
+                    map.removeLayer(tempMarker);
+                }
+            }, 5000);
         }
     });
 }
